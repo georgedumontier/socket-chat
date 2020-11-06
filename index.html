@@ -1,0 +1,110 @@
+<!doctype html>
+<html>
+
+<head>
+  <title>Socket Toomy</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Delius', cursive;
+    }
+
+    form {
+      background: #000;
+      padding: 3px;
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+    }
+
+    form input {
+      border: 0;
+      padding: 10px;
+      width: 90%;
+      margin-right: 0.5%;
+    }
+
+    form button {
+      width: 9%;
+      background: tomato;
+      border: none;
+      padding: 10px;
+    }
+
+    #messages {
+      list-style-type: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    #messages li {
+      padding: 5px 10px;
+    }
+
+    #messages li:nth-child(odd) {
+      background: #eee;
+    }
+    .username {
+      width:300px;
+      position: fixed;
+      bottom:41px;
+      border: 3px solid black;
+      border-bottom: 2px;
+      padding: 10px;
+    }
+    h1 {
+      margin: 0 auto;
+      font-size: 5em;
+      padding: 10px;
+      text-align:center;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>SoCkEt ToOmY</h1>
+  <ul id="messages"></ul>
+  <input class="username" placeholder="Username"></input>
+  <form action="">
+    <input id="george" autocomplete="off" placeholder="Send a message!" /><button>Send</button>
+  </form>
+  <link href="https://fonts.googleapis.com/css2?family=Delius&display=swap" rel="stylesheet">
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    try {
+      const socket = io();
+      const form = document.querySelector('form')
+      const george = document.querySelector('#george')
+      const messages = document.querySelector('#messages')
+      const username = document.querySelector('.username')
+
+      // const mock = (msg) => msg.split().map( (letter, i) => i % 2 === 0 ? letter.toUpperCase() : letter.toLowerCase() )
+      const mock = (msg) => msg.split('').map( (letter, i) => i % 2 === 0 ? letter.toUpperCase() : letter.toLowerCase()).join('')
+
+      form.addEventListener('submit', (e) => {
+        e.preventDefault()
+        if(!username.value) {
+          alert('please enter a username')
+          return false
+        }
+        socket.emit('chat', george.value, username.value)
+        george.value = ''
+      })
+
+      socket.on('welcome', () => messages.innerHTML += `<li><b>SocketBocket:</b> welcome to Socket Toomy, the chat room</li>`)
+      socket.on('chat', (msg, user) => {
+        messages.innerHTML += `<li><b>${user}:</b> ${mock(msg)}</li>`
+      })
+    } catch(e) {
+      console.error(e)
+    }
+
+  </script>
+</body>
+
+</html>
